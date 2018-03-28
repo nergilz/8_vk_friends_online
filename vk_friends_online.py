@@ -1,15 +1,19 @@
 import vk
+import getpass
+from vk.exceptions import VkException
 
 
-APP_ID = -1  # чтобы получить app_id, нужно зарегистрировать своё приложение на https://vk.com/dev
+APP_ID = 6421852
 
 
 def get_user_login():
-    pass
+    user_login = input(' input user login: ')
+    return user_login
 
 
 def get_user_password():
-    pass
+    user_password = getpass.getpass(' input user password: ')
+    return user_password
 
 
 def get_online_friends(login, password):
@@ -17,16 +21,26 @@ def get_online_friends(login, password):
         app_id=APP_ID,
         user_login=login,
         user_password=password,
+        scope='friends',
     )
     api = vk.API(session)
-    # например, api.friends.get()
+    friends_online = api.users.get(
+        user_ids=api.friends.getOnline(v=2.02),
+        v=2.02
+    )
+    return friends_online
 
 
 def output_friends_to_console(friends_online):
-    pass
+    for friend in friends_online:
+        print(friend['first_name'], friend['last_name'])
+
 
 if __name__ == '__main__':
-    login = get_user_login()
-    password = get_user_password()
-    friends_online = get_online_friends(login, password)
-    output_friends_to_console(friends_online)
+    try:
+        login = get_user_login()
+        password = get_user_password()
+        friends_online = get_online_friends(login, password)
+        output_friends_to_console(friends_online)
+    except VkException:
+        print(' ERROR: incorrect password or login!')
